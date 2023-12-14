@@ -7,7 +7,7 @@ var gameData = {
     evil: 0,
     paused: false,
     timeWarpingEnabled: true,
-
+    generationCount: 1,
     rebirthOneCount: 0,
     rebirthTwoCount: 0,
 
@@ -96,7 +96,7 @@ const itemBaseData = {
     "Personal Assistant": {name: "Personal Assistant", expense: 200, effect: 2, description: "Job xp"},
     "New Tools": {name: "New Tools", expense: 1000, effect: 2, description: "The Trades xp"},
     "Therapy": {name: "Therapy", expense: 7500, effect: 1.5, description: "Happiness"},
-    "School Connections": {name: "School Connections", expense: 50000, effect: 3, description: "Magic xp"},
+    "School Connections": {name: "School Connections", expense: 50000, effect: 3, description: "Management xp"},
     "Personal Tutor": {name: "Personal Tutor", expense: 1000000, effect: 2, description: "Skill xp"},
     "Library": {name: "Library", expense: 10000000, effect: 1.5, description: "Skill xp"},
 }
@@ -110,7 +110,7 @@ const jobCategories = {
 const skillCategories = {
     "Fundamentals": ["Concentration", "Productivity", "Sales", "Self Actualization"],
     "Grit": ["Strength", "Tool Skills", "Conditioning"],
-    "Magic": ["Money Flow", "Generational Wealth", "Experience", "Nobility"],
+    "Management": ["Money Flow", "Generational Wealth", "Experience", "Nobility"],
     "Dark magic": ["Dark influence", "Evil control", "Intimidation", "Demon training", "Blood meditation", "Demon's wealth"]
 }
 
@@ -125,7 +125,7 @@ const headerRowColors = {
     "Ownership": "#C71585",
     "Fundamentals": "#4a4e69",
     "Grit": "#ff704d",
-    "Magic": "#875F9A",
+    "Management": "#875F9A",
     "Dark magic": "#73000f",
     "Properties": "#219ebc",
     "Misc": "#b56576",
@@ -244,7 +244,7 @@ function addMultipliers() {
         } else if (task.name == "Strength") {
             task.xpMultipliers.push(getBindedTaskEffect("Conditioning"))
             task.xpMultipliers.push(getBindedItemEffect("Dumbbells"))
-        } else if (skillCategories["Magic"].includes(task.name)) {
+        } else if (skillCategories["Management"].includes(task.name)) {
             task.xpMultipliers.push(getBindedItemEffect("School Connections"))
         } else if (jobCategories["Ownership"].includes(task.name)) {
             task.xpMultipliers.push(getBindedTaskEffect("Money Flow"))
@@ -868,7 +868,7 @@ function rebirthTwo() {
 function rebirthReset() {
     setTab(jobTabButton, "jobs")
 
-    gameData.coins = 0
+    gameData.coins = getStartingWealth()
     gameData.days = 365 * 14
     gameData.currentJob = gameData.taskData["Beggar"]
     gameData.currentSkill = gameData.taskData["Concentration"]
@@ -894,6 +894,12 @@ function getLifespan() {
     var nobility = gameData.taskData["Nobility"]
     var lifespan = baseLifespan * generationalWealth.getEffect() * nobility.getEffect()
     return lifespan
+}
+
+function getStartingWealth() {
+    var generationalWealth = gameData.taskData["Generational Wealth"]
+    var nobility = gameData.taskData["Nobility"]
+    return gameData.coins *(1 - (generationalWealth.getEffect() * nobility.getEffect()))
 }
 
 function isAlive() {
